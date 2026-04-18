@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "brain.js": "2.0.0-beta.2",
-    "firebase-admin": "^11.0.0"
+    "firebase-admin": "11.10.1"
   },
   "engines": {
     "node": "18.x"
