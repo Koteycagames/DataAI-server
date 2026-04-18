@@ -1,0 +1,13 @@
+{
+  "name": "data-ai-server",
+  "version": "1.0.0",
+  "description": "Cloud training for DataAI",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "brain.js": "^2.0.0-beta.2",
+    "firebase-admin": "^11.0.0"
+  }
+}
