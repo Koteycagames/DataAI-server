@@ -1,7 +1,7 @@
-const brain = require('brain.js');
+// Используем чистую JS версию без нативных модулей
+const brain = require('brain.js/dist/index.js'); 
 const admin = require('firebase-admin');
 
-// 1. Настройка доступа через переменные (безопасно)
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
 admin.initializeApp({
@@ -12,41 +12,31 @@ admin.initializeApp({
 const db = admin.database();
 const net = new brain.recurrent.LSTM();
 
-console.log("🚀 Сервер DataAI запущен и готов к обучению!");
-
 async function trainModel() {
+    console.log("🚀 Чистый JS-движок запущен!");
     try {
-        console.log("📥 Получаю данные из Firebase...");
-        // Путь 'training_data/08' — убедись, что в Firebase данные лежат там
         const snapshot = await db.ref('training_data/08').once('value');
         const data = snapshot.val();
 
         if (!data) {
-            console.log("❌ Данные для обучения не найдены!");
+            console.log("❌ Данные не найдены!");
             return;
         }
 
-        console.log(`🧠 Начинаю жарить нейроны! (Примеров: ${data.length})`);
-        
+        console.log("🧠 Обучение пошло...");
         net.train(data, {
-            iterations: 1500, // Вот она, мощь сервера!
-            log: (details) => console.log(details),
-            logPeriod: 100
+            iterations: 1000,
+            log: (d) => console.log(d),
+            logPeriod: 50
         });
 
-        console.log("✅ Обучение окончено! Сохраняю веса...");
         const weights = JSON.stringify(net.toJSON());
-        
-        // Сохраняем готовую модель
-        await db.ref('models/DataAI_0_8').set({
-            weights: weights,
-            updatedAt: admin.database.ServerValue.TIMESTAMP
-        });
-
-        console.log("🚀 Всё! Модель DataAI_0.8 теперь в облаке. Можешь проверять на телефоне!");
-        process.exit(0); // Выключаем сервер после работы, чтобы не тратить лимиты
+        await db.ref('models/DataAI_0_8').set({ weights });
+        console.log("✅ Успех! Модель в облаке.");
+        process.exit(0);
     } catch (err) {
         console.error("💥 Ошибка:", err);
+        process.exit(1);
     }
 }
 
